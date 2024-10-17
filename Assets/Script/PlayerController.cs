@@ -1,5 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
-[RequireComponent(typeof(Animator), typeof(Rigidbody),typeof(BoxCollider))]
+[RequireComponent(typeof(Animator), typeof(Rigidbody),typeof(Collider))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -15,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [Header("Roll Settings")]
     public float rollDuration = 0.5f;
     public float rollSpeedMultiplier = 1.5f;
-    private BoxCollider _collider;
+    
     [Header("Ground Check")]
     public float groundCheckDistance = 0.1f;
 
@@ -33,7 +34,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
-        _collider = GetComponent<BoxCollider>();
+        
         // originalScale = transform.localScale;
         rb.isKinematic = false;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
@@ -145,5 +146,12 @@ public class PlayerController : MonoBehaviour
         
         // Ground check to see if the player is touching the ground
         return !isRolling  && Physics.Raycast(transform.position+Vector3.up, Vector3.down, groundCheckDistance);
+    }
+    void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("Game Over");
+        }
     }
 }
