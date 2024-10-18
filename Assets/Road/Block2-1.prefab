@@ -1108,8 +1108,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectToMove: {fileID: 1433548003513004654}
   targetPositionOffset: {x: 0, y: 2, z: 0}
-  moveDuration: 1
-  delayBeforeMove: 7
+  moveDuration: 2
+  delayBeforeMove: 6
 --- !u!1001 &3542164877782527484
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2910,8 +2910,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectToMove: {fileID: 5360471088783587940}
   targetPositionOffset: {x: 0, y: 2, z: 0}
-  moveDuration: 1
-  delayBeforeMove: 7
+  moveDuration: 2
+  delayBeforeMove: 6
 --- !u!4 &5360471088783587940 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2541493384378495873, guid: 0e2a0f88f62841f42ae86ae323be43bf,

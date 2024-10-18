@@ -101,7 +101,7 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse); // 使用 AddForce 跳跃
+        rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse); 
         isJumping = true;
         _animator.SetBool("IsJumping", true);
         _mosterAnimator.SetBool("IsJumping", true);
@@ -109,7 +109,7 @@ public class PlayerController : MonoBehaviour
 
     void ApplyBetterJumpPhysics()
     {
-        if (rb.velocity.y < 0) // 下落时加速
+        if (rb.velocity.y < 0) 
         {
             rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
             if (IsGrounded())
@@ -148,7 +148,7 @@ public class PlayerController : MonoBehaviour
         float newX = Mathf.MoveTowards(rb.position.x, targetX, laneSwitchSpeed * Time.fixedDeltaTime);
         Vector3 newPosition = new Vector3(newX, rb.position.y, rb.position.z) + forwardMovement;
 
-        rb.MovePosition(newPosition); // 通过MovePosition进行平滑移动
+        rb.MovePosition(newPosition); 
     }
 
     bool IsGrounded()

@@ -191,9 +191,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToMove: {fileID: 3492214891646860540}
-  targetPositionOffset: {x: 0, y: -3, z: 0}
-  moveDuration: 1
-  delayBeforeMove: 7
+  targetPositionOffset: {x: 0, y: -3.5, z: 0}
+  moveDuration: 2
+  delayBeforeMove: 6.5
 --- !u!1 &5987667304286145262
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,9 +313,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectToMove: {fileID: 1693633550120372315}
-  targetPositionOffset: {x: 0, y: -3, z: 0}
-  moveDuration: 1
-  delayBeforeMove: 7
+  targetPositionOffset: {x: 0, y: -3.5, z: 0}
+  moveDuration: 2
+  delayBeforeMove: 6.5
 --- !u!1 &6610072527360180563
 GameObject:
   m_ObjectHideFlags: 0
