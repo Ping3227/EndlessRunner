@@ -1,49 +1,57 @@
 using Unity.VisualScripting;
 using UnityEngine;
-[RequireComponent(typeof(Animator), typeof(Rigidbody),typeof(Collider))]
+using UnityEngine.Playables;
+
+[RequireComponent(typeof(Animator), typeof(Rigidbody), typeof(Collider))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    public float speed = 10.0f;
+    [Header("Movement Settings")] public float speed = 10.0f;
     public float laneDistance = 2.0f;
     public float laneSwitchSpeed = 5.0f;
 
-    [Header("Jump Settings")]
-    public float jumpSpeed = 7.0f;
+    [Header("Jump Settings")] public float jumpSpeed = 7.0f;
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
 
-    [Header("Roll Settings")]
-    public float rollDuration = 0.5f;
+    [Header("Roll Settings")] public float rollDuration = 0.5f;
     public float rollSpeedMultiplier = 1.5f;
-    
-    [Header("Ground Check")]
-    public float groundCheckDistance = 0.1f;
 
-    [Header("Animation")] 
-    private Animator _animator;
+    [Header("Ground Check")] public float groundCheckDistance = 0.1f;
+
+    [Header("Animation")] private Animator _animator;
+    private Animator _mosterAnimator;
     private int currentLane = 0;
     private bool isJumping = false;
+    private bool isDead = false;
     private bool isRolling = false;
     private float rollTimer = 0.0f;
     private float targetX;
-
+    [Header("EndGame")] [SerializeField] private PlayableDirector timelineDirector;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private GameOverController gameOverController;
     private Rigidbody rb;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
-        
+        _mosterAnimator = transform.GetChild(0).GetComponent<Animator>();
         // originalScale = transform.localScale;
         rb.isKinematic = false;
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY |
+                         RigidbodyConstraints.FreezeRotationZ;
+        gameOverController = FindObjectOfType<GameOverController>();
     }
 
     private void Update()
     {
-        HandleLaneSwitching();
-        HandleJumpAndRoll();
+        if (!isDead)
+        {
+            HandleLaneSwitching();
+            HandleJumpAndRoll();
+        }
+
+
     }
 
     private void FixedUpdate()
@@ -75,7 +83,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("JUmp");
         }
 
-        if (Input.GetKeyDown(KeyCode.DownArrow) &&!isJumping&& IsGrounded())
+        if (Input.GetKeyDown(KeyCode.DownArrow) && !isJumping && IsGrounded())
         {
             StartRoll();
             Debug.Log("Roll");
@@ -93,23 +101,25 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);  // 使用 AddForce 跳跃
+        rb.AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse); // 使用 AddForce 跳跃
         isJumping = true;
-        _animator.SetBool("IsJumping",true);
+        _animator.SetBool("IsJumping", true);
+        _mosterAnimator.SetBool("IsJumping", true);
     }
 
     void ApplyBetterJumpPhysics()
     {
-        if (rb.velocity.y < 0)  // 下落时加速
+        if (rb.velocity.y < 0) // 下落时加速
         {
             rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
             if (IsGrounded())
             {
                 isJumping = false;
-                _animator.SetBool("IsJumping",false);
+                _animator.SetBool("IsJumping", false);
+                _mosterAnimator.SetBool("IsJumping", false);
             }
         }
-        else if (rb.velocity.y > 0 && !Input.GetKey(KeyCode.UpArrow))  // 小跳
+        else if (rb.velocity.y > 0 && !Input.GetKey(KeyCode.UpArrow)) // 小跳
         {
             rb.velocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
         }
@@ -125,7 +135,7 @@ public class PlayerController : MonoBehaviour
     void EndRoll()
     {
         isRolling = false;
-        
+
     }
 
     void ApplyMovement()
@@ -138,20 +148,27 @@ public class PlayerController : MonoBehaviour
         float newX = Mathf.MoveTowards(rb.position.x, targetX, laneSwitchSpeed * Time.fixedDeltaTime);
         Vector3 newPosition = new Vector3(newX, rb.position.y, rb.position.z) + forwardMovement;
 
-        rb.MovePosition(newPosition);  // 通过MovePosition进行平滑移动
+        rb.MovePosition(newPosition); // 通过MovePosition进行平滑移动
     }
 
     bool IsGrounded()
     {
-        
+
         // Ground check to see if the player is touching the ground
-        return !isRolling  && Physics.Raycast(transform.position+Vector3.up, Vector3.down, groundCheckDistance);
+        return !isRolling && Physics.Raycast(transform.position + Vector3.up, Vector3.down, groundCheckDistance);
     }
+
     void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.CompareTag("Obstacle"))
         {
             Debug.Log("Game Over");
+            isDead = true;
+            _animator.SetBool("IsDead", true);
+            timelineDirector.Play();
+            audioSource.Play();
+            speed = 0;
+            GameManager.Instance.EndGame();
         }
     }
 }
